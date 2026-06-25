@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase, Motor } from '../lib/supabase';
+import { supabase, supabaseConfigured, Motor } from '../lib/supabase';
 
 const getImageSrc = (url: string | null) => {
   if (!url) return null;
@@ -13,23 +13,28 @@ export function MotorenPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   async function laadMotoren() {
-  //     const { data, error } = await supabase
-  //       .from('motoren')
-  //       .select('*')
-  //       .eq('beschikbaar', true)
-  //       .order('created_at', { ascending: false });
+  useEffect(() => {
+    if (!supabaseConfigured) {
+      setLoading(false);
+      return;
+    }
 
-  //     if (error) {
-  //       setError('Kon de motoren niet laden. Probeer het later opnieuw.');
-  //     } else {
-  //       setMotoren(data ?? []);
-  //     }
-  //     setLoading(false);
-  //   }
-  //   laadMotoren();
-  // }, []);
+    async function laadMotoren() {
+      const { data, error } = await supabase
+        .from('motoren')
+        .select('*')
+        .eq('beschikbaar', true)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        setError('Kon de motoren niet laden. Probeer het later opnieuw.');
+      } else {
+        setMotoren(data ?? []);
+      }
+      setLoading(false);
+    }
+    laadMotoren();
+  }, []);
 
   return (
     <main>
