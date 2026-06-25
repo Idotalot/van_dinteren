@@ -45,6 +45,8 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-white text-slate-950" style={{ '--navbar-height': '72px' } as React.CSSProperties}>
       <header className={`sticky top-0 z-50 transform transition-transform duration-300 bg-white border-b border-slate-200 backdrop-blur ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+        {/* Dekt het rubber-band gebied boven de navbar af op mobiel */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-full h-screen bg-white" />
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link to="/">
