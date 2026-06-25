@@ -147,7 +147,7 @@ export function HomePage() {
             Fullscreen omslagfoto met twee CTA-knoppen. De afbeelding vervaagt
             en beweegt omhoog (parallax) terwijl de gebruiker naar beneden scrolt.
         ──────────────────────────────────────────────────────────────────────── */}
-        <section ref={heroSectionRef} id="home" className="relative -mt-40 pt-20 overflow-hidden bg-transparent text-slate-900">
+        <section ref={heroSectionRef} id="home" className="relative -mt-40 pt-20 overflow-hidden bg-white text-slate-900">
             <div className="relative overflow-hidden">
             <img ref={heroImgRef} src={getGalleryImageSrc(heroImage)} alt="Voorzijde Bike Center Van Dinteren" className="h-[72vh] w-full object-cover will-change-transform" />
             <div className="pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-b from-white to-transparent" style={{ height: 'calc(var(--navbar-height) * 2)' }} />
