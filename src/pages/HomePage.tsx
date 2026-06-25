@@ -194,7 +194,7 @@ export function HomePage() {
         <section id="workshop" className="border-t border-slate-200 bg-slate-50 py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] items-start">
-                    <div>
+                    <div className="order-2 lg:order-1">
                       <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100 shadow-sm">
                           <div className="relative h-[420px] w-full overflow-hidden">
                               {workshopImages.map((image, index) => (
@@ -219,7 +219,7 @@ export function HomePage() {
                           ))}
                       </div>
                     </div>
-                    <div className="space-y-6">
+                    <div className="order-1 lg:order-2 space-y-6">
                         <div>
                             <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Werkplaats</p>
                             <h2 className="mt-3 text-3xl font-semibold text-[#41508C] sm:text-4xl">Onderhoud en reparatie met zekerheid</h2>
@@ -305,11 +305,11 @@ export function HomePage() {
                 <div className="relative left-1/2 mx-[-50vw] w-screen overflow-hidden">
                     <div ref={galleryTrackRef} className="gallery-marquee">
                         {[...galleryImages, ...galleryImages].map((src, index) => (
-                        <div key={`${src}-${index}`} className="w-[40rem] flex-none overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-200/30 mr-6">
+                        <div key={`${src}-${index}`} className="w-[16rem] sm:w-[28rem] lg:w-[40rem] flex-none overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-200/30 mr-4 sm:mr-6">
                             <img
                                 src={getGalleryImageSrc(src)}
                                 alt={`Showroom ${index + 1}`}
-                                className="h-[32rem] w-full object-cover"
+                                className="h-[12rem] sm:h-[22rem] lg:h-[32rem] w-full object-cover"
                             />
                         </div>
                         ))}
