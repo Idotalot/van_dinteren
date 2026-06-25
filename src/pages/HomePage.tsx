@@ -3,13 +3,16 @@ import { useEffect, useRef, useState } from 'react';
 import TextSlider from '../utils/SlidingText';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMotorcycle, faWrench, faShuttleVan } from '@fortawesome/free-solid-svg-icons';
+
 const slideWords = ['motoren', 'scooters', 'onderhoud'];
 
+// Zet een afbeeldingspad om naar een volledig /images/ pad
 const getGalleryImageSrc = (src: string) => {
   if (src.startsWith('/images/')) return src;
   return `/images/${src.replace(/^\//, '')}`;
 };
 
+// Koppeling tussen data.ts icoon-sleutels en FontAwesome iconen
 const featureIcons: Record<string, any> = {
   motorcyclist: faMotorcycle,
   maintenance: faWrench,
@@ -17,11 +20,28 @@ const featureIcons: Record<string, any> = {
 };
 
 export function HomePage() {
-    const [activeWord, setActiveWord] = useState(0);
+    // Refs voor het hero scroll-fade effect (geen state om re-renders te vermijden)
+    const heroSectionRef = useRef<HTMLElement>(null);
+    const heroImgRef = useRef<HTMLImageElement>(null);
+    const heroButtonsRef = useRef<HTMLDivElement>(null);
+
+    // Refs voor de automatisch scrollende galerij onderaan
     const galleryTrackRef = useRef<HTMLDivElement>(null);
     const animationRef = useRef<number>();
     const offsetRef = useRef(0);
 
+    // State voor de tekstwisselaar in de intro-sectie (ongebruikt activeWord kan worden verwijderd)
+    const [activeWord, setActiveWord] = useState(0);
+
+    // Werkplaats carousel: bijhouden welke foto actief is
+    const workshopImages = [
+      'werkplaats/werkplaats1.jpg',
+      'werkplaats/werkplaats2.jpg',
+      'werkplaats/werkplaats3.jpg',
+    ];
+    const [workshopImageIndex, setWorkshopImageIndex] = useState(0);
+
+    // Wissel automatisch elke 2.2 seconden het woord in de intro-tekst
     useEffect(() => {
         const interval = setInterval(() => {
         setActiveWord((current) => (current + 1) % slideWords.length);
@@ -30,12 +50,13 @@ export function HomePage() {
         return () => clearInterval(interval);
     }, []);
 
+    // Animeer de galerij-marquee via requestAnimationFrame voor vloeiende beweging
     useEffect(() => {
         const track = galleryTrackRef.current;
         if (!track) return;
 
         let lastTime = performance.now();
-        const speed = 0.22; // pixels per millisecond
+        const speed = 0.22; // pixels per milliseconde
 
         const step = (time: number) => {
             const delta = time - lastTime;
@@ -59,20 +80,32 @@ export function HomePage() {
         };
     }, []);
 
-    const texts = [
-        "motoren",
-        "scooters",
-        "onderhoud",
-        "motorkleding"
-    ];
+    // Hero scroll-fade: vervaag de hero-afbeelding en knoppen terwijl de gebruiker naar beneden scrolt.
+    // Directe DOM-manipulatie (geen setState) zodat dit op 60fps blijft draaien zonder re-renders.
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollY = window.scrollY;
+            const heroHeight = window.innerHeight * 0.72;
+            const progress = Math.min(scrollY / (heroHeight * 0.7), 1);
+            const opacity = 1 - progress;
+            const translateY = scrollY * 0.35;
 
-    const workshopImages = [
-      'werkplaats/werkplaats1.jpg',
-      'werkplaats/werkplaats2.jpg',
-      'werkplaats/werkplaats3.jpg',
-    ];
-    const [workshopImageIndex, setWorkshopImageIndex] = useState(0);
+            if (heroImgRef.current) {
+                heroImgRef.current.style.transform = `translateY(${translateY}px)`;
+                heroImgRef.current.style.opacity = String(opacity);
+            }
+            if (heroButtonsRef.current) {
+                // Knoppen verdwijnen twee keer zo snel als de afbeelding
+                heroButtonsRef.current.style.opacity = String(Math.max(0, 1 - progress * 2));
+                heroButtonsRef.current.style.transform = `translateY(${scrollY * 0.15}px)`;
+            }
+        };
 
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Wissel automatisch elke 4 seconden naar de volgende werkplaatsfoto
     useEffect(() => {
       const interval = setInterval(() => {
         setWorkshopImageIndex((current) => (current + 1) % workshopImages.length);
@@ -81,22 +114,26 @@ export function HomePage() {
       return () => clearInterval(interval);
     }, [workshopImages.length]);
 
-    const previousWorkshopImage = () => {
-      setWorkshopImageIndex((current) => (current - 1 + workshopImages.length) % workshopImages.length);
-    };
-
-    const nextWorkshopImage = () => {
-      setWorkshopImageIndex((current) => (current + 1) % workshopImages.length);
-    };
+    const texts = [
+        "motoren",
+        "scooters",
+        "onderhoud",
+        "motorkleding"
+    ];
 
     return (
         <main>
-        <section id="home" className="relative -mt-40 pt-20 overflow-hidden bg-transparent text-slate-900">
-            <div className="relative">
-            <img src={getGalleryImageSrc(heroImage)} alt="Voorzijde Bike Center Van Dinteren" className="h-[72vh] w-full object-cover" />
+
+        {/* ── HERO ─────────────────────────────────────────────────────────────
+            Fullscreen omslagfoto met twee CTA-knoppen. De afbeelding vervaagt
+            en beweegt omhoog (parallax) terwijl de gebruiker naar beneden scrolt.
+        ──────────────────────────────────────────────────────────────────────── */}
+        <section ref={heroSectionRef} id="home" className="relative -mt-40 pt-20 overflow-hidden bg-transparent text-slate-900">
+            <div className="relative overflow-hidden">
+            <img ref={heroImgRef} src={getGalleryImageSrc(heroImage)} alt="Voorzijde Bike Center Van Dinteren" className="h-[72vh] w-full object-cover will-change-transform" />
             <div className="pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-b from-white to-transparent" style={{ height: 'calc(var(--navbar-height) * 2)' }} />
             <div className="absolute inset-0 flex items-center justify-center px-4">
-                <div className="flex flex-col items-center gap-4 sm:flex-row">
+                <div ref={heroButtonsRef} className="flex flex-col items-center gap-4 sm:flex-row will-change-transform">
                 <a className="inline-flex min-w-[220px] items-center justify-center rounded-lg bg-brand-accent px-8 py-4 text-base font-semibold text-white transition hover:bg-brand-accent/90" href="#contact">
                     Neem contact op
                 </a>
@@ -108,6 +145,10 @@ export function HomePage() {
             </div>
         </section>
 
+        {/* ── INTRO + KENMERKEN ─────────────────────────────────────────────────
+            Animerende tekstwisselaar ("Uw specialist in motoren/scooters/…")
+            gevolgd door drie kaarten met de belangrijkste kenmerken van de zaak.
+        ──────────────────────────────────────────────────────────────────────── */}
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
             <div className='flex flex-col md:flex-row md:gap-2 md:items-center text-[#41508C] font-semibold'>
                 <p className='text-5xl'>Uw specialist in</p>
@@ -130,6 +171,11 @@ export function HomePage() {
             ))}
             </div>
         </section>
+
+        {/* ── MOTORENAANBOD (preview) ───────────────────────────────────────────
+            Toont een selectie motoren uit data.ts als voorproefje.
+            De knop "Bekijk alle motoren" linkt door naar /motoren (Supabase-data).
+        ──────────────────────────────────────────────────────────────────────── */}
         <section id="inventory" className="border-t border-slate-200 bg-slate-50 py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-10 text-center">
@@ -167,6 +213,10 @@ export function HomePage() {
             </div>
         </section>
 
+        {/* ── KLEDING ───────────────────────────────────────────────────────────
+            Statische kaarten voor de drie kledingcategorieën: helmen, jassen
+            en handschoenen. Nog geen productdata — puur informatief.
+        ──────────────────────────────────────────────────────────────────────── */}
         <section id="clothing" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 bg-white text-slate-950">
             <div className="mb-10 text-center">
                 <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Kleding</p>
@@ -191,6 +241,11 @@ export function HomePage() {
             </div>
         </section>
 
+        {/* ── WERKPLAATS ────────────────────────────────────────────────────────
+            Twee-koloms layout: tekst + dienstenlijst naast een foto-carousel.
+            Op mobiel staat de tekst bovenaan (order-1) en de foto eronder (order-2).
+            De carousel wisselt automatisch elke 4 seconden van foto.
+        ──────────────────────────────────────────────────────────────────────── */}
         <section id="workshop" className="border-t border-slate-200 bg-slate-50 py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] items-start">
@@ -207,6 +262,7 @@ export function HomePage() {
                               ))}
                           </div>
                       </div>
+                      {/* Stippen waarmee de gebruiker handmatig een foto kan kiezen */}
                       <div className="mt-4 flex justify-center gap-2">
                           {workshopImages.map((_, index) => (
                             <button
@@ -251,6 +307,10 @@ export function HomePage() {
             </div>
         </section>
 
+        {/* ── OVER ONS ─────────────────────────────────────────────────────────
+            Twee-koloms layout: openingstijden (uit data.ts) links, en rechts
+            een contactkaart met foto, adres, e-mail en telefoonnummers.
+        ──────────────────────────────────────────────────────────────────────── */}
         <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 bg-white text-slate-950">
             <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-start">
             <div>
@@ -294,6 +354,11 @@ export function HomePage() {
             </div>
         </section>
 
+        {/* ── GALERIJ ───────────────────────────────────────────────────────────
+            Automatisch scrollende beeldband (marquee) van showroom- en
+            werkplaatsfoto's. De animatie loopt via requestAnimationFrame
+            en herhaalt door de afbeeldingenlijst te verdubbelen.
+        ──────────────────────────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-slate-50 py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-10 text-center">
@@ -317,6 +382,7 @@ export function HomePage() {
                 </div>
             </div>
         </section>
+
         </main>
     );
 }
