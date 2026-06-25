@@ -80,6 +80,25 @@ export function HomePage() {
         };
     }, []);
 
+    // Fade-in bij scrollen: gebruik IntersectionObserver om [data-reveal] elementen zichtbaar te maken
+    // zodra ze de viewport binnenkomen. Elke animatie speelt slechts één keer af.
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
+
+        document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
+        return () => observer.disconnect();
+    }, []);
+
     // Hero scroll-fade: vervaag de hero-afbeelding en knoppen terwijl de gebruiker naar beneden scrolt.
     // Directe DOM-manipulatie (geen setState) zodat dit op 60fps blijft draaien zonder re-renders.
     useEffect(() => {
@@ -150,18 +169,18 @@ export function HomePage() {
             gevolgd door drie kaarten met de belangrijkste kenmerken van de zaak.
         ──────────────────────────────────────────────────────────────────────── */}
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-            <div className='flex flex-col md:flex-row md:gap-2 md:items-center text-[#41508C] font-semibold'>
+            <div data-reveal className='flex flex-col md:flex-row md:gap-2 md:items-center text-[#41508C] font-semibold'>
                 <p className='text-5xl'>Uw specialist in</p>
                 <div className='overflow-hidden h-10 text-3xl'>
                     <TextSlider texts={texts} interval={2000} />
                 </div>
             </div>
-            <p className="mt-2 mb-12 max-w-3xl text-base text-slate-600">
+            <p data-reveal data-delay="1" className="mt-2 mb-12 max-w-3xl text-base text-slate-600">
                 Bike Center Van Dinteren helpt u graag met deskundig onderhoud, aantrekkelijke motoren en een persoonlijke service met haal/breng service.
             </p>
             <div className="grid gap-8 lg:grid-cols-3">
-            {features.map((feature) => (
-                <article key={feature.title} className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
+            {features.map((feature, i) => (
+                <article key={feature.title} data-reveal data-delay={String(i + 2)} className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
                     <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#41508C] text-white">
                         <FontAwesomeIcon icon={featureIcons[feature.icon]} className="h-8 w-8" />
                     </div>
@@ -178,13 +197,13 @@ export function HomePage() {
         ──────────────────────────────────────────────────────────────────────── */}
         <section id="inventory" className="border-t border-slate-200 bg-slate-50 py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-10 text-center">
+            <div data-reveal className="mb-10 text-center">
                 <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Nieuwe motoren</p>
                 <h2 className="mt-3 text-3xl font-semibold text-[#41508C] sm:text-4xl">Rijd vandaag nog weg met een nieuwe droommotor</h2>
             </div>
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {inventory.map((item) => (
-                <article key={item.title} className="flex h-full flex-col bg-white rounded-lg hover:bg-gray-100 transition border border-gray-200">
+                {inventory.map((item, i) => (
+                <article key={item.title} data-reveal data-delay={String(Math.min(i + 1, 6))} className="flex h-full flex-col bg-white rounded-lg hover:bg-gray-100 transition border border-gray-200">
                     {item.image ? (
                     <div className="overflow-hidden rounded-t-lg bg-slate-100">
                         <img src={getGalleryImageSrc(item.image)} alt={item.title} className="h-60 w-full object-cover" />
@@ -218,7 +237,7 @@ export function HomePage() {
             en handschoenen. Nog geen productdata — puur informatief.
         ──────────────────────────────────────────────────────────────────────── */}
         <section id="clothing" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 bg-white text-slate-950">
-            <div className="mb-10 text-center">
+            <div data-reveal className="mb-10 text-center">
                 <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Kleding</p>
                 <h2 className="mt-3 text-3xl font-semibold text-[#41508C] sm:text-4xl">Motorkleding voor elk seizoen</h2>
                 <p className="mt-4 mx-auto max-w-2xl text-base text-slate-600">
@@ -226,15 +245,15 @@ export function HomePage() {
                 </p>
             </div>
             <div className="grid gap-6 md:grid-cols-3">
-                <article className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
+                <article data-reveal data-delay="1" className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
                     <h3 className="text-xl font-semibold text-[#41508C]">Helmen</h3>
                     <p className="mt-3 text-slate-600">Veilige en comfortabele helmen van topmerken voor dagelijks gebruik en lange ritten.</p>
                 </article>
-                <article className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
+                <article data-reveal data-delay="2" className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
                     <h3 className="text-xl font-semibold text-[#41508C]">Jassen</h3>
                     <p className="mt-3 text-slate-600">Lichtgewicht en waterdichte jassen met ventilatie en bescherming voor alle weersomstandigheden.</p>
                 </article>
-                <article className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
+                <article data-reveal data-delay="3" className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
                     <h3 className="text-xl font-semibold text-[#41508C]">Handschoenen</h3>
                     <p className="mt-3 text-slate-600">Handschoenen met goede grip en comfort, geschikt voor straat- en sportgebruik.</p>
                 </article>
@@ -249,7 +268,7 @@ export function HomePage() {
         <section id="workshop" className="border-t border-slate-200 bg-slate-50 py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] items-start">
-                    <div className="order-2 lg:order-1">
+                    <div data-reveal data-delay="2" className="order-2 lg:order-1">
                       <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100 shadow-sm">
                           <div className="relative h-[420px] w-full overflow-hidden">
                               {workshopImages.map((image, index) => (
@@ -275,7 +294,7 @@ export function HomePage() {
                           ))}
                       </div>
                     </div>
-                    <div className="order-1 lg:order-2 space-y-6">
+                    <div data-reveal data-delay="1" className="order-1 lg:order-2 space-y-6">
                         <div>
                             <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Werkplaats</p>
                             <h2 className="mt-3 text-3xl font-semibold text-[#41508C] sm:text-4xl">Onderhoud en reparatie met zekerheid</h2>
@@ -313,7 +332,7 @@ export function HomePage() {
         ──────────────────────────────────────────────────────────────────────── */}
         <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 bg-white text-slate-950">
             <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-start">
-            <div>
+            <div data-reveal>
                 <div className="mb-8">
                 <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Over ons</p>
                 <h2 className="mt-3 text-3xl font-semibold text-[#41508C] sm:text-4xl">Uw partner voor motoronderhoud en accessoires</h2>
@@ -335,7 +354,7 @@ export function HomePage() {
                 </div>
             </div>
 
-            <aside className="bg-white rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
+            <aside data-reveal data-delay="2" className="bg-white rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
                 <div className="space-y-6">
                 <div className="rounded-t-lg overflow-hidden bg-slate-100">
                     <img src="/images/joop.jpg" alt="Binnenkant Bike Center Van Dinteren" className="h-80 w-full object-cover" />
@@ -361,7 +380,7 @@ export function HomePage() {
         ──────────────────────────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-slate-50 py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-10 text-center">
+            <div data-reveal className="mb-10 text-center">
                 <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Galerij</p>
                 <h2 className="mt-3 text-3xl font-semibold text-[#41508C] sm:text-4xl">Onze showroom en werkplaats</h2>
             </div>

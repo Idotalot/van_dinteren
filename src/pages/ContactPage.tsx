@@ -14,7 +14,7 @@ export function ContactPage() {
     <main id="contact" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
       <section>
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-          <div>
+          <div data-reveal>
             <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Contact</p>
             <h2 className="mt-4 text-4xl font-semibold sm:text-5xl text-[#41508C]">Neem contact op met Bike Center Van Dinteren</h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
@@ -64,7 +64,7 @@ export function ContactPage() {
             </div>
           </div>
 
-          <form className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
+          <form data-reveal data-delay="2" className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-slate-700">Naam</label>
@@ -91,8 +91,8 @@ export function ContactPage() {
       </section>
 
       <section className="mt-16 grid gap-6 md:grid-cols-2">
-        {openingHours.map((period) => (
-          <div key={period.period} className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
+        {openingHours.map((period, i) => (
+          <div key={period.period} data-reveal data-delay={String(i + 1)} className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition">
             <h3 className="text-xl font-semibold text-slate-950">{period.period}</h3>
             <ul className="mt-5 space-y-3 text-slate-600">
               {period.details.map((line) => (
