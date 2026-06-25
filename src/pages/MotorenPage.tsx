@@ -13,23 +13,23 @@ export function MotorenPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function laadMotoren() {
-      const { data, error } = await supabase
-        .from('motoren')
-        .select('*')
-        .eq('beschikbaar', true)
-        .order('created_at', { ascending: false });
+  // useEffect(() => {
+  //   async function laadMotoren() {
+  //     const { data, error } = await supabase
+  //       .from('motoren')
+  //       .select('*')
+  //       .eq('beschikbaar', true)
+  //       .order('created_at', { ascending: false });
 
-      if (error) {
-        setError('Kon de motoren niet laden. Probeer het later opnieuw.');
-      } else {
-        setMotoren(data ?? []);
-      }
-      setLoading(false);
-    }
-    laadMotoren();
-  }, []);
+  //     if (error) {
+  //       setError('Kon de motoren niet laden. Probeer het later opnieuw.');
+  //     } else {
+  //       setMotoren(data ?? []);
+  //     }
+  //     setLoading(false);
+  //   }
+  //   laadMotoren();
+  // }, []);
 
   return (
     <main>
